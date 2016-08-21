@@ -1,6 +1,6 @@
 import psycopg2
 import json
-from get_lamp_data import get_data
+
 
 
 def man_db():
@@ -9,7 +9,10 @@ def man_db():
     password = "1220yangA"
     host = "localhost"
     port = "5432"
-    result = json.loads(get_data(5, 7))
+    json_file = '1.json'
+    f = open(json_file)
+    json_str = f.read()
+    result = json.loads(json_str)
     conn = psycopg2.connect(database=db_name, user=user, password=password, host=host, port=port)
     cur = conn.cursor()
     # cur.execute("CREATE TABLE test(id serial PRIMARY KEY, num integer,data varchar);")

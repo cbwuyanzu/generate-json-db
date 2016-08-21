@@ -1,5 +1,7 @@
 # coding: utf-8
 import json
+import datetime
+import random
 import time
 import xlrd
 from collections import defaultdict
@@ -32,17 +34,40 @@ def get_data(row_s, row_e):
         w_sum[datapoint[0]] += float(datapoint[4])
         cos_phi_sum[datapoint[0]] += float(datapoint[5])
     for key in OrderedDict(sorted(counts.items(), key=lambda t: t[0])):
-        timestamp = int(1000 * time.mktime(time.strptime(str(key), '%Y-%m-%d %H:%M:%S')))
+        timestamp = long(1000 * time.mktime(time.strptime(str(key), '%Y-%m-%d %H:%M:%S')))
+        date_time = datetime.datetime.fromtimestamp(timestamp / 1000)
         num = counts[key]
         u_avg = u_sum[key] / num
         p_avg = p_sum[key] / num
         i_avg = i_sum[key] / num
         w_avg = w_sum[key] / num
         cos_phi_avg = cos_phi_sum[key] / num
-        avg_datapoint = [timestamp, u_avg, p_avg, i_avg, w_avg, cos_phi_avg]
+        on_off = (1 if p_avg > 1 else 0)
+        level = int(p_avg * 100 / 115)
+        # print level
+        avg_datapoint = [timestamp, u_avg, i_avg, p_avg, cos_phi_avg, w_avg, on_off, level, str(date_time)]
         datapoints.append(avg_datapoint)
-    data_dict[u'values'] = datapoints
+    datapoints_all = extend_data(datapoints, -40) + extend_data(datapoints, -20) + datapoints + extend_data(datapoints, 20)
+    data_dict[u'values'] = datapoints_all
     return json.dumps(data_dict)
+
+
+def extend_data(raw_data, offset):
+    datapoints_new = []
+    for x in raw_data:
+        d_raw = datetime.datetime.fromtimestamp(x[0] / 1000)
+        d_new = d_raw + datetime.timedelta(offset)
+        time_stamp_new = int(1000 * time.mktime(time.strptime(str(d_new), '%Y-%m-%d %H:%M:%S')))
+        u_new = x[1] + 0.15 * random.uniform(-1, 1) * x[1]
+        i_new = x[2] + 0.15 * random.uniform(-1, 1) * x[2]
+        p_new = x[3] + 0.15 * random.uniform(-1, 1) * x[3]
+        cos_phi_new = x[4] + 0.15 * random.uniform(-1, 1) * x[4]
+        w_new = x[5] + 13.32 * offset / 20
+        on_off_new = (1 if p_new > 1 else 0)
+        level_new = int(p_new * 100 / 115)
+        datapoint_new = [time_stamp_new, u_new, i_new, p_new, cos_phi_new, w_new, on_off_new, level_new, str(d_new)]
+        datapoints_new.append(datapoint_new)
+    return datapoints_new
 
 
 def get_roundtime(list_data):
@@ -60,8 +85,7 @@ def get_roundtime(list_data):
 
 
 if __name__ == "__main__":
-    # print get_data(5, 300)
-    # get_roundtime(get_data(5, 9)[u'values'][0])
+    # get_data(5, 17806)
     f = open("1.json", "w+")
     console_print = get_data(5, 17806)
     # print console_print
