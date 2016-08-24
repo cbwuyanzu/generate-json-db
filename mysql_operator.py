@@ -4,9 +4,9 @@ import json
 
 
 def man_db(file_str):
-    db_name = "dearabao"
+    db_name = "ge"
     user = "root"
-    password = "1220yangA"
+    password = ""
     host = "127.0.0.1"
     port = 3306
     json_file = file_str + '.json'
@@ -29,5 +29,5 @@ def man_db(file_str):
 
 
 if __name__ == "__main__":
-    for s in range(2, 9):
+    for s in range(1, 9):
         man_db(str(s))

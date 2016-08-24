@@ -19,10 +19,14 @@ def generate_eight():
             u_new = d[3] + 0.15 * random.uniform(-1, 1) * d[3]
             i_new = d[4] + 0.15 * random.uniform(-1, 1) * d[4]
             p_new = d[5] + 0.15 * random.uniform(-1, 1) * d[5]
-            cos_phi_new = d[6] + 0.15 * random.uniform(-1, 1) * d[6]
+            cos_phi_new = d[6] + 0.025 * random.uniform(-1, 1) * d[6]
+            if cos_phi_new > 0.9999:
+                cos_phi_new = 0.9999
             w_new = d[7] + offset_w
             on_off_new = (1 if p_new > 1 else 0)
-            level_new = int(p_new * 100 / 115)
+            level_new = int(p_new * 10 / 115) * 10
+            if level_new > 100:
+                level_new = 100
             datapoint_new = [d[0], on_off_new, level_new, u_new, i_new, p_new, cos_phi_new, w_new, d[8]]
             datapoints.append(datapoint_new)
         data_dict[u'values'] = datapoints
